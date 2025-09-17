@@ -16,4 +16,11 @@ for /f "tokens=2 delims==; " %%a in ('wmic process where "CommandLine like '%%de
     echo %%a > deploy_reminder.pid
 )
 
+REM keyword_bot.py start
+start "" /B pythonw keyword\keyword_bot.py
+timeout /t 2 > nul
+for /f "tokens=2 delims==; " %%a in ('wmic process where "CommandLine like '%%keyword_bot.py%%'" get ProcessId /format:value ^| find "="') do (
+    echo %%a > keyword_bot.pid
+)
+
 echo Python started to service.
