@@ -7,6 +7,8 @@ import os
 from email.header import decode_header
 import time
 from datetime import datetime, timedelta
+import imgkit
+from slack_sdk import WebClient
 
 # Slack Webhook
 SLACK_WEBHOOK_URL = "" #your slack webhook url
@@ -98,6 +100,23 @@ def extract_first_link_from_html(html):
     except Exception as e:
         print("링크 추출 오류:", e)
     return None
+
+def send_html_to_slack(subject, html_content):
+    try:
+        # HTML → PNG 변환
+        img_file = "mail_preview.png"
+        imgkit.from_string(html_content, img_file)
+
+        # Slack에 업로드
+        client.files_upload(
+            channels=SLACK_CHANNEL,
+            file=img_file,
+            title=f"📧 {subject}",
+            initial_comment=f"*새 이메일 도착!* 제목: {subject}"
+        )
+        print("✅ Slack 업로드 성공")
+    except Exception as e:
+        print(f"Slack 전송 실패: {e}")
 
 def send_to_slack(subject, sender, request_url):
 
